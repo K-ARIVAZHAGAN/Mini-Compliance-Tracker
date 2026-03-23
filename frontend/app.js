@@ -38,6 +38,11 @@ function debounce(fn, delay) {
 
 async function fetchJson(url, options) {
   const response = await fetch(url, options);
+
+  if (response.status === 204) {
+    return null;
+  }
+
   if (!response.ok) {
     const body = await response.json().catch(() => ({ error: "Request failed" }));
     throw new Error(body.error || "Request failed");
