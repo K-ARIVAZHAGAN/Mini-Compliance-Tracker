@@ -5,7 +5,7 @@ A full-stack compliance tracker for managing filings, taxes, and operational com
 ## Senior-Style Project Structure
 
 ```text
-Assignment/
+Mini_Compliance _Tracker/
 ├── backend/
 │   ├── data/
 │   │   └── compliance.db
