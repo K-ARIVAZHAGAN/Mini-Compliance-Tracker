@@ -146,7 +146,7 @@ For persistent production data, move to a hosted database (for example, Neon Pos
 
 ## Required Submission Items
 
-1. Deployed app link: Add your Netlify URL here after first deploy
+1. Deployed app link: https://mini-compliance-tracker-v-0-1.netlify.app/
 2. GitHub repository link with commit history: https://github.com/K-ARIVAZHAGAN/Mini-Compliance-Tracker
 3. Setup instructions (this README)
 4. Tradeoffs and assumptions
