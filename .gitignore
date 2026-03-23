@@ -1,6 +1,0 @@
-node_modules/
-backend/data/compliance.db
-.env
-.DS_Store
-/.gitignore
-/.dockerignore
