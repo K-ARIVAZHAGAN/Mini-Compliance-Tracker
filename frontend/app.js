@@ -199,6 +199,7 @@ function renderTasks() {
             <span class="status status-${task.status.toLowerCase()}">${escapeHtml(task.status)}</span>
             ${overdue ? '<span class="overdue-label">Overdue</span>' : ""}
             <button type="button" data-task-id="${task.id}" data-next-status="${nextStatus}">Mark ${nextStatus}</button>
+            <button type="button" data-delete-task-id="${task.id}">Delete</button>
           </div>
         </article>
       `;
@@ -210,6 +211,10 @@ function renderTasks() {
   taskListEl.querySelectorAll("button[data-task-id]").forEach((button) => {
     button.addEventListener("click", () => updateTaskStatus(button.dataset.taskId, button.dataset.nextStatus));
   });
+
+  taskListEl.querySelectorAll("button[data-delete-task-id]").forEach((button) => {
+    button.addEventListener("click", () => deleteTask(button.dataset.deleteTaskId));
+  });
 }
 
 async function updateTaskStatus(taskId, status) {
@@ -219,6 +224,19 @@ async function updateTaskStatus(taskId, status) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({ status })
+  });
+
+  await Promise.all([loadTasks(), loadStats()]);
+}
+
+async function deleteTask(taskId) {
+  const confirmed = window.confirm("Delete this task? This action cannot be undone.");
+  if (!confirmed) {
+    return;
+  }
+
+  await fetchJson(`/api/tasks/${taskId}`, {
+    method: "DELETE"
   });
 
   await Promise.all([loadTasks(), loadStats()]);

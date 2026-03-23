@@ -45,4 +45,22 @@ router.patch("/:id/status", async (req, res, next) => {
   }
 });
 
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const taskId = Number.parseInt(req.params.id, 10);
+    if (Number.isNaN(taskId)) {
+      return res.status(400).json({ error: "Invalid task id" });
+    }
+
+    const deleteResult = await run("DELETE FROM tasks WHERE id = $1", [taskId]);
+    if (deleteResult.changes === 0) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    return next(error);
+  }
+});
+
 module.exports = router;
