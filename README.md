@@ -133,6 +133,11 @@ This project is configured for Netlify using:
   - Functions directory: `netlify/functions`
 4. Deploy.
 
+### Quick Links
+
+- GitHub Repository: https://github.com/K-ARIVAZHAGAN/Mini-Compliance-Tracker
+- One-click Netlify import: https://app.netlify.com/start/deploy?repository=https://github.com/K-ARIVAZHAGAN/Mini-Compliance-Tracker
+
 ### Important SQLite Note
 
 On Netlify Functions, SQLite is stored in `/tmp/compliance.db`, which is ephemeral. Data can reset on cold starts/redeploys.
@@ -141,8 +146,8 @@ For persistent production data, move to a hosted database (for example, Neon Pos
 
 ## Required Submission Items
 
-1. Deployed app link
-2. GitHub repository link with commit history
+1. Deployed app link: Add your Netlify URL here after first deploy
+2. GitHub repository link with commit history: https://github.com/K-ARIVAZHAGAN/Mini-Compliance-Tracker
 3. Setup instructions (this README)
 4. Tradeoffs and assumptions
 
