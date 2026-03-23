@@ -217,4 +217,22 @@ router.post("/:id/tasks", async (req, res, next) => {
   }
 });
 
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const clientId = Number.parseInt(req.params.id, 10);
+    if (Number.isNaN(clientId)) {
+      return res.status(400).json({ error: "Invalid client id" });
+    }
+
+    const deleteResult = await run("DELETE FROM clients WHERE id = $1", [clientId]);
+    if (deleteResult.changes === 0) {
+      return res.status(404).json({ error: "Client not found" });
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    return next(error);
+  }
+});
+
 module.exports = router;

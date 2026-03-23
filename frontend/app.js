@@ -75,13 +75,22 @@ function renderClients() {
     const li = document.createElement("li");
     li.className = "client-item";
 
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = client.id === state.selectedClientId ? "active" : "";
-    button.innerHTML = `<strong>${escapeHtml(client.company_name)}</strong><span>${escapeHtml(client.country)} | ${escapeHtml(client.entity_type)}</span>`;
-    button.addEventListener("click", () => selectClient(client.id));
+    const selectButton = document.createElement("button");
+    selectButton.type = "button";
+    selectButton.className = client.id === state.selectedClientId ? "active" : "";
+    selectButton.innerHTML = `<strong>${escapeHtml(client.company_name)}</strong><span>${escapeHtml(client.country)} | ${escapeHtml(client.entity_type)}</span>`;
+    selectButton.addEventListener("click", () => selectClient(client.id));
 
-    li.appendChild(button);
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      deleteClient(client.id);
+    });
+
+    li.appendChild(selectButton);
+    li.appendChild(deleteButton);
     clientListEl.appendChild(li);
   });
 }
@@ -227,6 +236,19 @@ async function updateTaskStatus(taskId, status) {
   });
 
   await Promise.all([loadTasks(), loadStats()]);
+}
+
+async function deleteClient(clientId) {
+  const confirmed = window.confirm("Delete this client and all associated tasks? This action cannot be undone.");
+  if (!confirmed) {
+    return;
+  }
+
+  await fetchJson(`/api/clients/${clientId}`, {
+    method: "DELETE"
+  });
+
+  await loadClients();
 }
 
 async function deleteTask(taskId) {
