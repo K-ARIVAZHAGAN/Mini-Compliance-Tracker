@@ -16,7 +16,7 @@ router.patch("/:id/status", async (req, res, next) => {
       return res.status(400).json({ error: "Status must be Pending or Completed" });
     }
 
-    const updateResult = await run("UPDATE tasks SET status = ? WHERE id = ?", [status, taskId]);
+    const updateResult = await run("UPDATE tasks SET status = $1 WHERE id = $2", [status, taskId]);
     if (updateResult.changes === 0) {
       return res.status(404).json({ error: "Task not found" });
     }
@@ -32,9 +32,9 @@ router.patch("/:id/status", async (req, res, next) => {
         due_date,
         status,
         priority,
-        CASE WHEN status = 'Pending' AND date(due_date) < date('now') THEN 1 ELSE 0 END AS is_overdue
+        CASE WHEN status = 'Pending' AND due_date < CURRENT_DATE THEN 1 ELSE 0 END AS is_overdue
       FROM tasks
-      WHERE id = ?
+      WHERE id = $1
       `,
       [taskId]
     );

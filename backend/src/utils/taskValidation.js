@@ -16,18 +16,18 @@ function normalizeSortDir(sortDir) {
 
 function buildTaskOrderBy(sortBy, sortDir) {
   if (sortBy === "priority") {
-    return `CASE priority WHEN 'High' THEN 3 WHEN 'Medium' THEN 2 WHEN 'Low' THEN 1 ELSE 0 END ${sortDir}, date(due_date) ASC`;
+    return `CASE priority WHEN 'High' THEN 3 WHEN 'Medium' THEN 2 WHEN 'Low' THEN 1 ELSE 0 END ${sortDir}, due_date ASC`;
   }
 
   if (sortBy === "status") {
-    return `status ${sortDir}, date(due_date) ASC`;
+    return `status ${sortDir}, due_date ASC`;
   }
 
   if (sortBy === "title") {
-    return `title ${sortDir}, date(due_date) ASC`;
+    return `title ${sortDir}, due_date ASC`;
   }
 
-  return `date(due_date) ${sortDir}, CASE priority WHEN 'High' THEN 3 WHEN 'Medium' THEN 2 WHEN 'Low' THEN 1 ELSE 0 END DESC`;
+  return `due_date ${sortDir}, CASE priority WHEN 'High' THEN 3 WHEN 'Medium' THEN 2 WHEN 'Low' THEN 1 ELSE 0 END DESC`;
 }
 
 module.exports = {

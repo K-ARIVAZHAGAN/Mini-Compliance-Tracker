@@ -20,7 +20,7 @@ const TASK_SELECT = `
     due_date,
     status,
     priority,
-    CASE WHEN status = 'Pending' AND date(due_date) < date('now') THEN 1 ELSE 0 END AS is_overdue
+    CASE WHEN status = 'Pending' AND due_date < CURRENT_DATE THEN 1 ELSE 0 END AS is_overdue
   FROM tasks
 `;
 
@@ -52,13 +52,14 @@ router.post("/", async (req, res, next) => {
     const result = await run(
       `
       INSERT INTO clients (company_name, country, entity_type)
-      VALUES (?, ?, ?)
+      VALUES ($1, $2, $3)
+      RETURNING id
       `,
       [companyName.trim(), country.trim(), entityType.trim()]
     );
 
     const insertedClient = await get(
-      "SELECT id, company_name, country, entity_type FROM clients WHERE id = ?",
+      "SELECT id, company_name, country, entity_type FROM clients WHERE id = $1",
       [result.id]
     );
 
@@ -81,20 +82,23 @@ router.get("/:id/tasks", async (req, res, next) => {
     }
 
     const params = [clientId];
-    const whereConditions = ["client_id = ?"];
+    const whereConditions = ["client_id = $1"];
 
     if (status) {
-      whereConditions.push("status = ?");
       params.push(status);
+      whereConditions.push(`status = $${params.length}`);
     }
 
     if (req.query.category) {
-      whereConditions.push("category = ?");
       params.push(req.query.category);
+      whereConditions.push(`category = $${params.length}`);
     }
 
     if (req.query.q) {
-      whereConditions.push("(title LIKE ? OR description LIKE ? OR category LIKE ?)");
+      const startIndex = params.length + 1;
+      whereConditions.push(
+        `(title ILIKE $${startIndex} OR description ILIKE $${startIndex + 1} OR category ILIKE $${startIndex + 2})`
+      );
       const searchTerm = `%${req.query.q.trim()}%`;
       params.push(searchTerm, searchTerm, searchTerm);
     }
@@ -123,9 +127,9 @@ router.get("/:id/tasks/stats", async (req, res, next) => {
         COUNT(*) AS total,
         SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) AS pending,
         SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) AS completed,
-        SUM(CASE WHEN status = 'Pending' AND date(due_date) < date('now') THEN 1 ELSE 0 END) AS overdue
+        SUM(CASE WHEN status = 'Pending' AND due_date < CURRENT_DATE THEN 1 ELSE 0 END) AS overdue
       FROM tasks
-      WHERE client_id = ?
+      WHERE client_id = $1
       `,
       [clientId]
     );
@@ -134,7 +138,7 @@ router.get("/:id/tasks/stats", async (req, res, next) => {
       `
       SELECT category, COUNT(*) AS count
       FROM tasks
-      WHERE client_id = ?
+      WHERE client_id = $1
       GROUP BY category
       ORDER BY count DESC, category ASC
       `,
@@ -160,7 +164,7 @@ router.post("/:id/tasks", async (req, res, next) => {
       return res.status(400).json({ error: "Invalid client id" });
     }
 
-    const client = await get("SELECT id FROM clients WHERE id = ?", [clientId]);
+    const client = await get("SELECT id FROM clients WHERE id = $1", [clientId]);
     if (!client) {
       return res.status(404).json({ error: "Client not found" });
     }
@@ -192,7 +196,8 @@ router.post("/:id/tasks", async (req, res, next) => {
     const result = await run(
       `
       INSERT INTO tasks (client_id, title, description, category, due_date, status, priority)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id
       `,
       [
         clientId,
@@ -205,7 +210,7 @@ router.post("/:id/tasks", async (req, res, next) => {
       ]
     );
 
-    const insertedTask = await get(`${TASK_SELECT} WHERE id = ?`, [result.id]);
+    const insertedTask = await get(`${TASK_SELECT} WHERE id = $1`, [result.id]);
     return res.status(201).json(insertedTask);
   } catch (error) {
     return next(error);

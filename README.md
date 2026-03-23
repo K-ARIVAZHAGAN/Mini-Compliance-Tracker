@@ -7,8 +7,6 @@ A full-stack compliance tracker for managing filings, taxes, and operational com
 ```text
 Mini_Compliance _Tracker/
 ├── backend/
-│   ├── data/
-│   │   └── compliance.db
 │   ├── src/
 │   │   ├── app.js
 │   │   ├── db/
@@ -45,13 +43,13 @@ Mini_Compliance _Tracker/
 - Search tasks by title, description, or category
 - Sorting by due date, priority, and title
 - Summary stats (total, pending, completed, overdue, filtered count)
-- SQLite persistent storage with automatic seed data
+- PostgreSQL (Neon) persistent storage with automatic seed data
 - Docker support for containerized run
 
 ## Tech Stack
 
 - Backend: Node.js, Express
-- Database: SQLite
+- Database: PostgreSQL (Neon)
 - Frontend: HTML, CSS, Vanilla JavaScript
 
 ## Data Models
@@ -92,13 +90,21 @@ Mini_Compliance _Tracker/
 npm install
 ```
 
-2. Start the application
+2. Configure environment
+
+```bash
+cp .env.example .env
+```
+
+Set `DATABASE_URL` in `.env` using your Neon connection string.
+
+3. Start the application
 
 ```bash
 npm start
 ```
 
-3. Open in browser
+4. Open in browser
 
 - http://localhost:3000
 
@@ -128,21 +134,23 @@ This project is configured for Netlify using:
 
 1. Push this repository to GitHub.
 2. In Netlify, select **Add new project** and import this repo.
-3. Keep default build settings from `netlify.toml`:
+3. Add environment variable in Netlify:
+  - `DATABASE_URL`: your Neon connection string
+4. Keep default build settings from `netlify.toml`:
   - Publish directory: `frontend`
   - Functions directory: `netlify/functions`
-4. Deploy.
+5. Deploy.
 
 ### Quick Links
 
 - GitHub Repository: https://github.com/K-ARIVAZHAGAN/Mini-Compliance-Tracker
 - One-click Netlify import: https://app.netlify.com/start/deploy?repository=https://github.com/K-ARIVAZHAGAN/Mini-Compliance-Tracker
 
-### Important SQLite Note
+### Important Database Note
 
-On Netlify Functions, SQLite is stored in `/tmp/compliance.db`, which is ephemeral. Data can reset on cold starts/redeploys.
+This app is configured for Neon Postgres to keep data persistent on Netlify Functions.
 
-For persistent production data, move to a hosted database (for example, Neon Postgres or Supabase Postgres).
+If `DATABASE_URL` is missing or invalid, API routes will fail until Netlify env variables are updated.
 
 ## Required Submission Items
 
@@ -160,6 +168,6 @@ For persistent production data, move to a hosted database (for example, Neon Pos
 
 ## Tradeoffs
 
-- SQLite was chosen for speed of delivery and persistence without external infrastructure.
+- Neon Postgres was chosen to ensure persistence and reliability on Netlify serverless infrastructure.
 - Vanilla JavaScript frontend keeps complexity low and implementation transparent.
 - API and UI prioritize assignment functionality over advanced enterprise concerns (auth, audit trails, role permissions).
