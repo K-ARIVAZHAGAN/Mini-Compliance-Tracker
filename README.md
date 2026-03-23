@@ -92,8 +92,16 @@ npm install
 
 2. Configure environment
 
+macOS/Linux:
+
 ```bash
 cp .env.example .env
+```
+
+Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
 ```
 
 Set `DATABASE_URL` in `.env` using your Neon connection string.
@@ -151,6 +159,50 @@ This project is configured for Netlify using:
 This app is configured for Neon Postgres to keep data persistent on Netlify Functions.
 
 If `DATABASE_URL` is missing or invalid, API routes will fail until Netlify env variables are updated.
+
+## Deployment Verification Checklist
+
+Run these checks after every production deploy:
+
+1. Open deployed app:
+  - https://mini-compliance-tracker-v-0-1.netlify.app/
+2. Verify API health:
+  - `GET /api/clients` returns `200` with JSON.
+3. Create a new task from UI and verify:
+  - task appears in list,
+  - filters work,
+  - status update works,
+  - overdue style appears for pending past-due tasks.
+
+## Troubleshooting
+
+### API returns 502 on Netlify
+
+Most common root cause: missing or incorrectly scoped `DATABASE_URL`.
+
+Fix:
+
+1. Open the same Netlify site used by production URL.
+2. Set `DATABASE_URL` in Environment Variables.
+3. Scope it to **All deploy contexts** (or explicitly include Production).
+4. Trigger **Clear cache and deploy site**.
+
+### Local app works, deployed app fails
+
+This usually means local `.env` is correct but Netlify runtime environment is not. Re-check Netlify variable key/value and deploy context.
+
+## Security Notes
+
+- Never commit `.env`.
+- If a DB URL/password is exposed in chat/logs, rotate credentials immediately in Neon.
+- Update Netlify `DATABASE_URL` after rotation and redeploy.
+
+## Future Hardening (Post-Assignment)
+
+- Add auth for write routes.
+- Add rate limiting on POST/PATCH endpoints.
+- Add pagination limits for large datasets.
+- Add monitoring and alerts for API failures.
 
 ## Required Submission Items
 
