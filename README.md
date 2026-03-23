@@ -116,19 +116,28 @@ docker build -t mini-compliance-tracker .
 docker run -p 3000:3000 mini-compliance-tracker
 ```
 
-## Deployment (Required for Submission)
+## Deployment on Netlify
 
-You can deploy this app quickly on Render, Railway, or Fly.io.
+This project is configured for Netlify using:
 
-### Render Example
+- Static frontend from `frontend/`
+- Express API via Netlify Function at `netlify/functions/api.js`
+- Route rewrite from `/api/*` to `/.netlify/functions/api/*`
+
+### Steps
 
 1. Push this repository to GitHub.
-2. Create a new Web Service from the repo.
-3. Use these settings:
-   - Build command: `npm install`
-   - Start command: `npm start`
-   - Environment: `Node`
-4. Deploy and copy the generated public URL.
+2. In Netlify, select **Add new project** and import this repo.
+3. Keep default build settings from `netlify.toml`:
+  - Publish directory: `frontend`
+  - Functions directory: `netlify/functions`
+4. Deploy.
+
+### Important SQLite Note
+
+On Netlify Functions, SQLite is stored in `/tmp/compliance.db`, which is ephemeral. Data can reset on cold starts/redeploys.
+
+For persistent production data, move to a hosted database (for example, Neon Postgres or Supabase Postgres).
 
 ## Required Submission Items
 

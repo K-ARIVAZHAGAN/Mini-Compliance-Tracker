@@ -1,7 +1,9 @@
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 
-const DB_PATH = path.join(__dirname, "..", "..", "data", "compliance.db");
+const defaultDbPath = path.join(__dirname, "..", "..", "data", "compliance.db");
+const netlifyDbPath = path.join("/tmp", "compliance.db");
+const DB_PATH = process.env.DB_PATH || (process.env.NETLIFY ? netlifyDbPath : defaultDbPath);
 const db = new sqlite3.Database(DB_PATH);
 
 function run(sql, params = []) {
